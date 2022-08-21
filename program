@@ -1,0 +1,8 @@
+psh 0 1
+psh 1 2
+loop 10
+    add
+    prt
+    mov 2 1 
+    mov 0 2 
+end
