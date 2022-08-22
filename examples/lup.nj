@@ -1,0 +1,8 @@
+psh 1 1
+add
+
+lup 10
+    prt
+    mov 0 2
+    add
+end

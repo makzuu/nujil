@@ -6,7 +6,9 @@ module.exports = {
     },
 
     add: () => {
-        stk[0] = stk.slice(1).reduce((a, el) => a + el)
+        stk[0] = stk.slice(1).reduce((a, el) => {
+            return +a + +el
+        })
     },
 
     mov: (addr, to) => {
