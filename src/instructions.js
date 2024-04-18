@@ -1,65 +1,44 @@
-const commands = require('./commands')
-const file = require('./readFile')()
+const file = require("./readFile")()
+const commandList = require("./commands")
 
-let ii = file.split('\n').filter(el => el !== '')
-    .map(el => el.split(' ').filter(el => el !== ''))
-    .filter(el => el[0] !== '-')
+function makeCommand(commandData) {
+    const commandName = commandData[0]
+    const func = commandList[commandName]
+    if (func == undefined) {
+        throw `Syntax Error: command ${commandName} does not exist`
+    }
+    const [, ...args] = commandData
 
-// () => command(...args)
-// [command, arg, arg]
-const simpleCommand = array => {
-    return () => commands[array[0]](...array.slice(1))
+    return () => func(...args)
 }
 
-let func
-const args = []
-const simplentCommand = array => {
-    return (args) => () => {
-        commands[array[0]](array[1], args)
+function getInstructions() {
+    let instructionsArray = file.split('\n').filter(el => el !== '')
+        .map(el => el.split(' ').filter(el => el !== ''))
+        .filter(el => el[0] !== '-')
+
+    instructions = []
+    subInstructions = []
+    for (let i = 0; i < instructionsArray.length; i++) {
+        const instructionName = instructionsArray[i][0]
+        if (instructionName == "lup") {
+            const interations = instructionsArray[i][1]
+            i++
+            while (i < instructionsArray.length && instructionsArray[i][0] != "end") {
+                subInstructions.push(makeCommand(instructionsArray[i]))
+                i++
+            }
+            if (instructionsArray[i][0] == "end") {
+                i++
+                instructions.push(makeCommand(["lup", interations, subInstructions]))
+            } else {
+                throw "Syntax Error: end keyword expected at end of lup body"
+            }
+        } else {
+            instructions.push(makeCommand(instructionsArray[i]))
+        }
     }
+    return instructions
 }
 
-ii = ii.map(c => {
-    const command = c[0]
-    if (command === 'end') {
-        return func(args)
-    }else if (command !== 'lup' && command !== 'end' && func !== undefined) {
-        args.push(simpleCommand(c))
-        return ''
-    } else if (command !== 'lup' && command !== 'end') {
-        return simpleCommand(c)
-    } else if (command === 'lup') {
-        func = simplentCommand(c) 
-        return ''
-    }
-})
-
-ii = ii.filter(el => el !== '')
-
-// psh 1 1
-// add
-// prt
-// psh 1 2
-// add
-// prt
-// lup 10
-//     mov 0 1
-//     add
-//     prt
-// end
-
-// ii = [
-//     () => _.psh(1, 1),
-//     () => _.add(),
-//     () => _.prt(),
-//     () => _.psh(1, 2),
-//     () => _.add(),
-//     () => _.prt(),
-//     () => _.lup(10, [
-//         () => _.mov(0, 1),
-//         () => _.add(),
-//         () => _.prt(),
-//     ])
-// ]
-
-module.exports = ii
+module.exports = getInstructions()

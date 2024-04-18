@@ -1,6 +1,6 @@
 const fs = require('node:fs')
 
-const readFile = () => {
+function readFile() {
     try {
         return fs.readFileSync(process.argv[2], { encoding: 'utf8' })
     } catch (error) {

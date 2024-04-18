@@ -1,32 +1,34 @@
-const stk = require('./stk')
+const stk = [0, 0, 0, 0, 0, 0, 0, 0]
 
-module.exports = {
-    psh: (value, addr) => {
-        stk[addr] = value
-    },
+function psh(value, address) {
+    stk[address] = value
+}
 
-    add: () => {
-        stk[0] = stk.slice(1).reduce((a, el) => {
-            return +a + +el
-        })
-    },
+function add() {
+    let sum = 0
+    for (let i = 1; i < stk.length; i++) {
+        sum += Number(stk[i])
+    }
+    psh(sum, 0)
+}
 
-    mov: (addr, to) => {
-        stk[to] = stk[addr]
-        stk[addr] = 0
-    },
+function mov(address, to) {
+    stk[to] = stk[address]
+    stk[address] = 0
+}
 
-    prt: () => {
-        console.log(stk[0])
-    },
+function prt() {
+    console.log(stk[0])
+}
 
-    lup: (i, cc) => {
-        let z = 0
-        while (z < i) {
-            cc.forEach(command => {
-               command() 
-            })
-            z++
+function lup(iterations, subCommands) {
+    let i = 0
+    while (i < iterations) {
+        for (command of subCommands) {
+            command()
         }
+        i++
     }
 }
+
+module.exports = { psh, add, mov, prt, lup }
